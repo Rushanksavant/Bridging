@@ -13,36 +13,35 @@ use(Web3ClientPlugin)
 
 const provider = new providers.JsonRpcProvider(parent.rpc);
 
-
-const posClient = new POSClient();
-
-async function initializeClient() {
-    await posClient.init({
-        network: 'testnet',
-        version: 'mumbai',
+const getPOSClient = (network = 'testnet', version = 'mumbai') => {
+    const posClient = new POSClient()
+    return posClient.init({
+        log: true,
+        network: network,
+        version: version,
+        child: {
+            provider: child.rpc,
+            defaultConfig: {
+                from: user2.address
+            },
+        },
         parent: {
             provider: new Wallet(user1.privateKey, provider),
             defaultConfig: {
                 from: user1.address
             }
         },
-        child: {
-            provider: child.rpc,
-            defaultConfig: {
-                from: user2.address
-            }
-        }
     })
 }
-// initializeClient()
-// console.log(posClient)
+
 
 module.exports = {
-    getPOSClient: initializeClient,
+    getPOSClient: getPOSClient,
     child: child,
     pos: pos,
     from: user1.address,
     privateKey: user1.privateKey,
     to: user2.address,
     proofApi: proofApi,
+    ropstenProvider: provider
 };
