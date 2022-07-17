@@ -3,19 +3,19 @@ const { getPOSClient, from, ropstenProvider, pos } = require("./init/posClient.j
 const { depositETH, approveERC20, depositERC20 } = require("./helper.js")
 
 // Main function
-const execute = async (fixedBalance) => {
+const execute = async () => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.erc20
+    const gasPrice = 30000 * 5000000000 // gasLimit * gasPrice
 
     while (true) {
-
         // Bridging ETH
         let ethBalanceNow = await ropstenProvider.getBalance(from)
         ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
-
-        if (ethBalanceNow > fixedBalance) {
-            const amount = ethBalanceNow - fixedBalance;
+        if (ethBalanceNow > gasPrice) {
+            console.log("possible")
+            const amount = ethBalanceNow - gasPrice;
             await depositETH(client, amount, from); // bridge
         }
 
@@ -38,7 +38,7 @@ const execute = async (fixedBalance) => {
 
 
 // Main function call
-execute(2999478150966601102).then(() => {
+execute().then(() => {
 }).catch(err => {
     console.error("err", err);
 }).finally(_ => {
