@@ -1,6 +1,6 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("./init/posClient.js")
-
+const { depositETH, approveERC20, depositERC20 } = require("./helper.js")
 
 // Main function
 const execute = async (fixedBalance) => {
@@ -16,29 +16,20 @@ const execute = async (fixedBalance) => {
 
         if (ethBalanceNow > fixedBalance) {
             const amount = ethBalanceNow - fixedBalance;
-            const result = await client.depositEther(amount, from);
-
-            const txHash = await result.getTransactionHash();
-            console.log("txHash = ", txHash);
-            const receipt = await result.getReceipt();
-            console.log("receipt = ", receipt);
+            await depositETH(client, amount, from); // bridge
         }
 
         // Bridging ERC20
         for (let i; i < tokens.length; i++) {
 
-            const erc20Token = posClient.erc20(tokens[i], true);
+            const erc20Token = client.erc20(tokens[i], true);
             // get balance of user
             let balance = await erc20Token.getBalance(from);
             balance = BigNumber.from(ethBalanceNow).toString()
 
             if (balance > 0) {
-
-                const result = await erc20Token.deposit(balance, from);
-
-                const txHash = await result.getTransactionHash();
-
-                const txReceipt = await result.getReceipt();
+                await approveERC20(erc20Token, balance) // lock asset
+                await depositERC20(erc20Token, balance, from) // bridge
             }
         }
 
