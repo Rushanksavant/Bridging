@@ -7,7 +7,7 @@ const execute = async () => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.erc20
-    const gasPrice = 30000 * 5000000000 // gasLimit * gasPrice
+    const gasPrice = 3000000 * 5000000000 // gasLimit * gasPrice
 
     while (true) {
         // Bridging ETH
