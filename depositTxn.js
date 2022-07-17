@@ -36,6 +36,8 @@ const execute = async () => {
                     await depositERC20(erc20Token, balance, from) // bridge
                 }
             }
+        } else {
+            console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
         }
 
     }
