@@ -6,7 +6,7 @@ const { depositETH, approveERC20, depositERC20 } = require("./helper.js")
 const execute = async () => {
 
     const client = await getPOSClient();
-    const tokens = pos.parent.erc20
+    const tokens = pos.parent.test
     const gasPrice = 3000000 * 5000000000 // gasLimit * gasPrice
 
     while (true) {
