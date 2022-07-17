@@ -1,19 +1,16 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider } = require("./init/posClient.js")
 
-// let fixedBalance = await ropstenProvider.getBalance(from)
-// fixedBalance = BigNumber.from(fixedBalance).toString()
-
 const execute = async (fixedBalance) => {
 
     while (true) {
 
-        let balanceNow = await ropstenProvider.getBalance(from)
-        balanceNow = BigNumber.from(balanceNow).toString()
-        if (balanceNow > fixedBalance) {
+        let ethBalanceNow = await ropstenProvider.getBalance(from)
+        ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
+        if (ethBalanceNow > fixedBalance) {
 
             const client = await getPOSClient();
-            const amount = balanceNow - fixedBalance;
+            const amount = ethBalanceNow - fixedBalance;
             const result = await client.depositEther(amount, from);
 
             const txHash = await result.getTransactionHash();
