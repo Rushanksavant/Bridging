@@ -7,29 +7,34 @@ const execute = async () => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.test
-    const gasPrice = 3000000 * 5000000000 // gasLimit * gasPrice
+    const minBalanceETH = 3000000 * 5000000000 // minimum eth balance of wallet
 
     while (true) {
         // Bridging ETH
         let ethBalanceNow = await ropstenProvider.getBalance(from)
         ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
-        if (ethBalanceNow > gasPrice) {
+        if (ethBalanceNow > minBalanceETH) {
             console.log("possible")
-            const amount = ethBalanceNow - gasPrice;
+            const amount = ethBalanceNow - minBalanceETH;
             await depositETH(client, amount, from); // bridge
         }
 
+
         // Bridging ERC20
-        for (let i; i < tokens.length; i++) {
+        let ethBalanceNow2 = await ropstenProvider.getBalance(from)
+        ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
+        if (ethBalanceNow2 > minBalanceETH) {
+            for (let i; i < tokens.length; i++) {
 
-            const erc20Token = client.erc20(tokens[i], true);
-            // get balance of user
-            let balance = await erc20Token.getBalance(from);
-            balance = BigNumber.from(ethBalanceNow).toString()
+                const erc20Token = client.erc20(tokens[i], true);
+                // get balance of user
+                let balance = await erc20Token.getBalance(from);
+                balance = BigNumber.from(ethBalanceNow).toString()
 
-            if (balance > 0) {
-                await approveERC20(erc20Token, balance) // lock asset
-                await depositERC20(erc20Token, balance, from) // bridge
+                if (balance > 0) {
+                    await approveERC20(erc20Token, balance) // lock asset
+                    await depositERC20(erc20Token, balance, from) // bridge
+                }
             }
         }
 
