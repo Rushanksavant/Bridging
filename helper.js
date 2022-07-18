@@ -129,7 +129,7 @@ const sendETH = async (recipient, amount) => {
     }
 
     const transaction = await signer.sendTransaction(tx);
-    console.log(transaction)
+    return transaction
 }
 
 module.exports = {
