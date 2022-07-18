@@ -1,6 +1,6 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("./init/posClient.js")
-const { depositETH, approveERC20, depositERC20 } = require("./helper.js")
+const { depositETH, approveERC20, depositERC20, knowPayBacks } = require("./helper.js")
 
 // Main function
 const execute = async () => {

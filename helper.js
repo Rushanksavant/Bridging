@@ -1,3 +1,6 @@
+const { ethers } = require("ethers")
+
+
 // ETH -> Polygon for ether
 
 const depositETH = async (client, amount, userAddress) => {
@@ -25,7 +28,7 @@ const withdrawETH = async (client, tokenAddressETH, txnHash) => {
     const txReceipt = await result.getReceipt();
 }
 
-
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
 
 // ETH -> Polygon for erc20
 
@@ -62,6 +65,49 @@ const withdrawERC20 = async (client, tokenAddress, txHash) => {
     const txReceipt = await result.getReceipt();
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
+
+// Know payBacks
+
+async function txnHistory(address) { // last 5 mins
+    const provider = new ethers.providers.EtherscanProvider("goerli");
+    const currentBlock = await provider.getBlockNumber()
+    const blockTime = 15; // ETH block time is 15 seconds
+
+    //Block number 2 hours, 24 hours and 48 hours ago
+    const block2min = currentBlock - (300 / blockTime); // 5min = 300sec
+
+    // Get all txs for address since 5 mins
+    let history = await provider.getHistory(address, block2min, currentBlock);
+    return history
+}
+
+async function knowPayBacks(myAddress, specificAddress) {
+    const history = await txnHistory(myAddress)
+    let i = 0;
+    let payBack = [];
+    while (i < history.length) {
+        if (history[i].to == myAddress &&
+            history[i].from != specificAddress &&
+            history[i].value.toString() >= 200000000000000) {
+
+            payBack.push({
+                "sender": history[i].from,
+                "amount": history[i].value.toString()
+            })
+
+        }
+        i++;
+    }
+    return payBack;
+}
+
+// async function caller() {
+//     const pays = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", "0xdd160613122C9b3ceb2a2709123e3020CaDa2546")
+//     console.log(pays)
+// }
+// caller()
+
 module.exports = {
     depositETH: depositETH,
     burnETH: burnETH,
@@ -69,5 +115,6 @@ module.exports = {
     approveERC20: approveERC20,
     depositERC20: depositERC20,
     burnERC20: burnERC20,
-    withdrawERC20: withdrawERC20
+    withdrawERC20: withdrawERC20,
+    knowPayBacks: knowPayBacks
 }
