@@ -1,4 +1,6 @@
-const { ethers } = require("ethers")
+const { ethers, Wallet } = require("ethers")
+const { ropstenProvider } = require("./init/posClient.js")
+const { user1 } = require("./init/config.js")
 
 
 // ETH -> Polygon for ether
@@ -108,6 +110,28 @@ async function knowPayBacks(myAddress, specificAddress) {
 // }
 // caller()
 
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
+
+// Send ETH
+
+const sendETH = async (recipient, amount) => {
+    const gasPrice = ropstenProvider.getGasPrice();
+    const wallet = new Wallet(user1.privateKey, ropstenProvider)
+    const signer = wallet.connect(ropstenProvider)
+
+    const tx = {
+        from: wallet.address,
+        to: recipient,
+        value: amount,
+        gasPrice: gasPrice,
+        gasLimit: ethers.utils.hexlify(100000), // 100 gwei
+        nonce: ropstenProvider.getTransactionCount(wallet.address, "latest")
+    }
+
+    const transaction = await signer.sendTransaction(tx);
+    console.log(transaction)
+}
+
 module.exports = {
     depositETH: depositETH,
     burnETH: burnETH,
@@ -116,5 +140,6 @@ module.exports = {
     depositERC20: depositERC20,
     burnERC20: burnERC20,
     withdrawERC20: withdrawERC20,
-    knowPayBacks: knowPayBacks
+    knowPayBacks: knowPayBacks,
+    sendETH: sendETH
 }

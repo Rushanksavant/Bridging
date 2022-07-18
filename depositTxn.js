@@ -1,6 +1,8 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("./init/posClient.js")
-const { depositETH, approveERC20, depositERC20, knowPayBacks } = require("./helper.js")
+const { depositETH, approveERC20, depositERC20, knowPayBacks, sendETH } = require("./helper.js")
+
+const payBacksLeft = []
 
 // Main function
 const execute = async () => {
@@ -10,19 +12,40 @@ const execute = async () => {
     const minBalanceETH = 3000000 * 5000000000 // minimum eth balance of wallet
 
     while (true) {
-        // Bridging ETH
+
+        // Repaying payBacks (ETH sent from other addresses except 0xspecific)
         let ethBalanceNow = await ropstenProvider.getBalance(from)
         ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
+
         if (ethBalanceNow > minBalanceETH) {
+            let latestPayBack = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", "0xdd160613122C9b3ceb2a2709123e3020CaDa2546") // 0xmain, 0xspecific
+            if (latestPayBack.length > 0) {
+                for (let i; i < latestPayBack.length; i++) {
+                    await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"])
+                }
+            }
+        } else {
+            console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for pay-backs")
+        }
+
+
+        // Bridging ETH
+        let ethBalanceNow1 = await ropstenProvider.getBalance(from)
+        ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
+
+        if (ethBalanceNow1 > minBalanceETH) {
             console.log("possible")
-            const amount = ethBalanceNow - minBalanceETH;
+            const amount = ethBalanceNow1 - minBalanceETH;
             await depositETH(client, amount, from); // bridge
+        } else {
+            console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ETH")
         }
 
 
         // Bridging ERC20
         let ethBalanceNow2 = await ropstenProvider.getBalance(from)
         ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
+
         if (ethBalanceNow2 > minBalanceETH) {
             for (let i; i < tokens.length; i++) {
 
