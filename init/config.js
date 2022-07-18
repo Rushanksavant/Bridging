@@ -9,6 +9,7 @@ if (env.error) {
 }
 
 module.exports = {
+    allowedSender: "0xdd160613122C9b3ceb2a2709123e3020CaDa2546",
     parent: {
         rpc: process.env.ROOT_RPC,
     },
