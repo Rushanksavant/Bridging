@@ -2,8 +2,6 @@ const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("./init/posClient.js")
 const { depositETH, approveERC20, depositERC20, knowPayBacks, sendETH } = require("./helper.js")
 
-const payBacksLeft = []
-
 /**
  * @title Main function
  * @dev If ETH balance > minBalanceETH, repay ETH to senders (except 0xspecific)
