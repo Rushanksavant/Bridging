@@ -25,7 +25,6 @@ const execute = async (specificAddress) => {
         if (latestPayBack.length > 0) {
             let i = 0;
             while (i < latestPayBack.length) {
-                console.log("hii")
                 const transaction = await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"])
                 console.log(transaction)
                 i++
