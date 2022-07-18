@@ -22,7 +22,7 @@ const execute = async (specificAddress) => {
         ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
 
         if (ethBalanceNow > minBalanceETH) {
-            let latestPayBack = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", specificAddress) // 0xmain, 0xspecific
+            let latestPayBack = await knowPayBacks(from, specificAddress) // 0xmain, 0xspecific
             if (latestPayBack.length > 0) {
                 for (let i; i < latestPayBack.length; i++) {
                     await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"])
