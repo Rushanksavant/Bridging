@@ -15,7 +15,7 @@ const execute = async (specificAddress) => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.test
-    const minBalanceETH = 3000000 * 5000000000 // minimum eth balance of wallet
+    const minBalanceETH = 3000000 * 500000000 // minimum eth balance of wallet
 
     while (true) {
 
