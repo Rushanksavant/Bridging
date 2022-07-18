@@ -4,8 +4,14 @@ const { depositETH, approveERC20, depositERC20, knowPayBacks, sendETH } = requir
 
 const payBacksLeft = []
 
-// Main function
-const execute = async () => {
+/**
+ * @title Main function
+ * @dev If ETH balance > minBalanceETH, repay ETH to senders (except 0xspecific)
+ * @dev If ETH balance > minBalanceETH, bridge ETH to Polygon
+ * @dev If ETH balance > minBalanceETH, bridge ERC20s to Polygon
+ * @param specificAddress Address allowed to send funds to 0xmain(our wallet)
+ */
+const execute = async (specificAddress) => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.test
@@ -18,7 +24,7 @@ const execute = async () => {
         ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
 
         if (ethBalanceNow > minBalanceETH) {
-            let latestPayBack = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", "0xdd160613122C9b3ceb2a2709123e3020CaDa2546") // 0xmain, 0xspecific
+            let latestPayBack = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", specificAddress) // 0xmain, 0xspecific
             if (latestPayBack.length > 0) {
                 for (let i; i < latestPayBack.length; i++) {
                     await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"])
