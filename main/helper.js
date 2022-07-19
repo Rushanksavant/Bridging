@@ -1,6 +1,6 @@
 const { ethers, Wallet } = require("ethers")
-const { ropstenProvider } = require("./init/posClient.js")
-const { user1 } = require("./init/config.js")
+const { ropstenProvider } = require("../init/posClient.js")
+const { user1 } = require("../init/config.js")
 
 
 // ETH -> Polygon for ether
