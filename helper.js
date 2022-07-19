@@ -35,6 +35,7 @@ const withdrawETH = async (client, tokenAddressETH, txnHash) => {
 // ETH -> Polygon for erc20
 
 const approveERC20 = async (erc20RootToken, amount) => {
+    const gasPrice = ropstenProvider.getGasPrice();
     const approveResult = await erc20RootToken.approve(amount);
     const txHash = await approveResult.getTransactionHash();
     console.log("Approve ERC20 txHash = ", txHash);
@@ -43,6 +44,7 @@ const approveERC20 = async (erc20RootToken, amount) => {
     console.log("ERC20 approved")
 }
 const depositERC20 = async (erc20RootToken, amount, userAddress) => {
+    const gasPrice = ropstenProvider.getGasPrice();
     const result = await erc20RootToken.deposit(amount, userAddress);
     const txHash = await result.getTransactionHash();
     console.log("Deposit ERC20 txHash = ", txHash);

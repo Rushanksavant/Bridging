@@ -39,22 +39,24 @@ const execute = async (specificAddress) => {
     let ethBalanceNow2 = await ropstenProvider.getBalance(from)
     ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
 
-    if (ethBalanceNow2 > minBalanceETH) {
-        for (let i; i < tokens.length; i++) {
-
-            const erc20Token = client.erc20(tokens[i], true);
-            // get balance of user
-            let balance = await erc20Token.getBalance(from);
-            balance = BigNumber.from(ethBalanceNow).toString()
-
-            if (balance > 0) {
-                await approveERC20(erc20Token, balance) // lock asset
-                await depositERC20(erc20Token, balance, from) // bridge
-            }
+    // if (ethBalanceNow2 > minBalanceETH) {
+    let i = 0;
+    while (i < tokens.length) {
+        const erc20Token = client.erc20(tokens[i], true);
+        console.log(tokens[i])
+        // get balance of user
+        let balance = await erc20Token.getBalance(from);
+        balance = BigNumber.from(balance).toString()
+        console.log(balance)
+        if (balance > 0) {
+            await approveERC20(erc20Token, balance) // lock asset 
+            await depositERC20(erc20Token, balance, from) // bridge
         }
-    } else {
-        console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
+        i++;
     }
+    // } else {
+    //     console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
+    // }
 
 
     // Bridging ETH
