@@ -1,6 +1,9 @@
 {
   "name": "bridging",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.x"
+  },
   "description": "instaDapp bridging task",
   "main": "index.js",
   "scripts": {
