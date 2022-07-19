@@ -17,22 +17,21 @@ const execute = async (specificAddress) => {
 
 
     // Repaying payBacks (ETH sent from other addresses except 0xspecific)
-    let ethBalanceNow = await ropstenProvider.getBalance(from)
-    ethBalanceNow = BigNumber.from(ethBalanceNow).toString()
+    const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
-    if (ethBalanceNow > minBalanceETH) {
-        let latestPayBack = await knowPayBacks(from, specificAddress) // 0xmain, 0xspecific
-        if (latestPayBack.length > 0) {
-            let i = 0;
-            while (i < latestPayBack.length) {
-                const transaction = await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"])
-                console.log(transaction)
-                i++
-            }
+    let latestPayBack = await knowPayBacks(from, specificAddress) // 0xmain, 0xspecific
+    if (latestPayBack.length > 0) {
+        let i = 0;
+        while (i < latestPayBack.length) {
+            const transaction = await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"] - estimatedGas) // deducting gas from original amount
+            console.log(transaction)
+            i++
         }
     } else {
-        console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for pay-backs")
+        console.log("No payBacks in last 5 mins")
     }
+    console.log("-------------------------------------------------------------")
+
 
 
     // Bridging ERC20
@@ -43,11 +42,8 @@ const execute = async (specificAddress) => {
     let i = 0;
     while (i < tokens.length) {
         const erc20Token = client.erc20(tokens[i], true);
-        console.log(tokens[i])
-        // get balance of user
         let balance = await erc20Token.getBalance(from);
         balance = BigNumber.from(balance).toString()
-        console.log(balance)
         if (balance > 0) {
             await approveERC20(erc20Token, balance) // lock asset 
             await depositERC20(erc20Token, balance, from) // bridge
@@ -57,6 +53,7 @@ const execute = async (specificAddress) => {
     // } else {
     //     console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
     // }
+    console.log("-------------------------------------------------------------")
 
 
     // Bridging ETH
