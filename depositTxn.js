@@ -5,8 +5,8 @@ const { depositETH, approveERC20, depositERC20, knowPayBacks, sendETH } = requir
 /**
  * @title Main function
  * @dev If ETH balance > minBalanceETH, repay ETH to senders (except 0xspecific)
- * @dev If ETH balance > minBalanceETH, bridge ETH to Polygon
  * @dev If ETH balance > minBalanceETH, bridge ERC20s to Polygon
+ * @dev If ETH balance > minBalanceETH, bridge ETH to Polygon
  * @param specificAddress Address allowed to send funds to 0xmain(our wallet)
  */
 const execute = async (specificAddress) => {
@@ -35,20 +35,6 @@ const execute = async (specificAddress) => {
     }
 
 
-    // Bridging ETH
-    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
-    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
-
-    if (ethBalanceNow1 > minBalanceETH) {
-        console.log("possible")
-        const amount = ethBalanceNow1 - minBalanceETH;
-        console.log(amount)
-        await depositETH(client, amount, from); // bridge
-    } else {
-        console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ETH")
-    }
-
-
     // Bridging ERC20
     let ethBalanceNow2 = await ropstenProvider.getBalance(from)
     ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
@@ -69,6 +55,21 @@ const execute = async (specificAddress) => {
     } else {
         console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
     }
+
+
+    // Bridging ETH
+    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
+    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
+
+    if (ethBalanceNow1 > minBalanceETH) {
+        console.log("possible")
+        const amount = ethBalanceNow1 - minBalanceETH;
+        console.log(amount)
+        await depositETH(client, amount, from); // bridge
+    } else {
+        console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ETH")
+    }
+
 };
 
 
