@@ -14,6 +14,8 @@ const execute = async (specificAddress) => {
     const client = await getPOSClient();
     const tokens = pos.parent.test
     const minBalanceETH = 3000000 * 500000000 // minimum eth balance of wallet
+    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
+    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
 
 
     // Repaying payBacks (ETH sent from other addresses except 0xspecific)
@@ -24,19 +26,21 @@ const execute = async (specificAddress) => {
         let i = 0;
         while (i < latestPayBack.length) {
             const transaction = await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"] - estimatedGas) // deducting gas from original amount
+            ethBalanceNow1 = ethBalanceNow1 - latestPayBack[i]["amount"] // update current ETH wallet balance
             console.log(transaction)
             i++
         }
     } else {
         console.log("No payBacks in last 5 mins")
     }
-    console.log("-------------------------------------------------------------")
+    console.log("--------------------------------------------------------------------------------")
 
 
 
     // Bridging ERC20
-    let ethBalanceNow2 = await ropstenProvider.getBalance(from)
-    ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
+
+    // let ethBalanceNow2 = await ropstenProvider.getBalance(from)
+    // ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
 
     // if (ethBalanceNow2 > minBalanceETH) {
     let i = 0;
@@ -53,12 +57,10 @@ const execute = async (specificAddress) => {
     // } else {
     //     console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
     // }
-    console.log("-------------------------------------------------------------")
+    console.log("--------------------------------------------------------------------------------")
 
 
     // Bridging ETH
-    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
-    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
 
     if (ethBalanceNow1 > minBalanceETH) {
         console.log("possible")
