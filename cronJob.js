@@ -1,7 +1,7 @@
 var cron = require('node-cron');
 const { main } = require("./main/depositTxn.js")
 
-cron.schedule('* */5 * * * *', async () => {
+cron.schedule('0 */5 * * * *', async () => {
     console.log('');
     console.log('********************************************************************************');
     console.log('');
