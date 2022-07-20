@@ -125,6 +125,9 @@ const erc20ABI = [
     'event Approval(address indexed src, address indexed guy, uint256 wad)',
     'event LogNote(bytes4 indexed sig, address indexed usr, bytes32 indexed arg1, bytes32 indexed arg2, bytes data) anonymous',
     'event Transfer(address indexed src, address indexed dst, uint256 wad)',
+    'function decimals() view returns (uint8)',
+    'function approve(address usr, uint256 wad) returns (bool)',
+    'function transfer(address dst, uint256 wad) returns (bool)'
 ]
 
 async function erc20TxnHistory(contractAddress, block5min) {
@@ -168,6 +171,7 @@ async function erc20KnowPayBacks(contractAddresses, specificAddress, block5min) 
 //     console.log(ans)
 // }
 // call()
+
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
 // Send ETH
@@ -192,6 +196,22 @@ const sendETH = async (recipient, amount) => {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
+// Send ERC20
+
+async function sendERC20(recipient, amount, tokenAddress) {
+    const wallet = new Wallet(user1.privateKey, ropstenProvider)
+    const signer = wallet.connect(ropstenProvider)
+
+    const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, ropstenProvider);
+    const decimal = await tokenContract.decimals()
+    amount = amount / (10 ** decimal)
+    amount = ethers.utils.parseUnits(amount.toString() + ".0", decimal)
+
+    const transaction = await tokenContract.connect(signer).transfer(recipient, amount)
+    return transaction
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
 // 
 module.exports = {
     depositETH: depositETH,
@@ -201,5 +221,6 @@ module.exports = {
     knowPayBacks: knowPayBacks,
     sendETH: sendETH,
     erc20KnowPayBacks: erc20KnowPayBacks,
-    contractAddresses: pos.parent.test // pos.parent.erc20 when using mainnet 
+    contractAddresses: pos.parent.test, // pos.parent.erc20 when using mainnet 
+    sendERC20: sendERC20
 }

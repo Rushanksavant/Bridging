@@ -1,6 +1,6 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("../init/posClient.js")
-const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks, erc20KnowPayBacks, contractAddresses, sendETH } = require("./helper.js")
+const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks, erc20KnowPayBacks, contractAddresses, sendETH, sendERC20 } = require("./helper.js")
 
 /**
  * @title Main function
