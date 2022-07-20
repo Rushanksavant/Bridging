@@ -1,6 +1,6 @@
 const { ethers, Wallet } = require("ethers")
 const { ropstenProvider } = require("../init/posClient.js")
-const { user1 } = require("../init/config.js")
+const { user1, pos } = require("../init/config.js")
 
 
 // ETH -> Polygon for ether
@@ -84,8 +84,7 @@ async function calculateBlockNum(timeInterval) {
 
 // Know payBacks
 
-async function txnHistory(address, block5min, currentBlock) { // last 5 mins
-    // const block5min = calculateBlockNum(300) // 5min = 300sec
+async function txnHistory(address, block5min, currentBlock) {
     const provider = new ethers.providers.EtherscanProvider("goerli");
     // Get all txs for address since 5 mins
     let history = await provider.getHistory(address, block5min, currentBlock);
@@ -128,13 +127,6 @@ const erc20ABI = [
     'event Transfer(address indexed src, address indexed dst, uint256 wad)',
 ]
 
-const dERC20_Add = "0x655F2166b0709cd575202630952D71E2bB0d61Af";
-const dERC20 = new ethers.Contract(dERC20_Add, erc20ABI, ropstenProvider); // Contract pointer
-
-const wETH_Add = "0x60D4dB9b534EF9260a88b0BED6c486fe13E604Fc";
-const wETH = new ethers.Contract(wETH_Add, erc20ABI, ropstenProvider); // Contract pointer
-
-
 async function erc20TxnHistory(contractAddress, block5min) {
 
     const contractPointer = new ethers.Contract(contractAddress, erc20ABI, ropstenProvider);
@@ -143,14 +135,13 @@ async function erc20TxnHistory(contractAddress, block5min) {
         return transferTxn["blockNumber"] >= block5min
     }
 
-    const eventFilter = contractPointer.filters.Transfer(null, "0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", null)
+    const eventFilter = contractPointer.filters.Transfer(null, user1.address, null)
     const events = await contractPointer.queryFilter(eventFilter)
     var filtered = events.filter(arrayFilter)
     return filtered
 }
 
-async function erc20KnowPayBacks(contractAddresses, block5min) {
-    // const block5min = calculateBlockNum(300) // 5min = 300sec
+async function erc20KnowPayBacks(contractAddresses, specificAddress, block5min) {
     let erc20PayBack = []
 
     let i = 0;
@@ -158,18 +149,25 @@ async function erc20KnowPayBacks(contractAddresses, block5min) {
         const history = await erc20TxnHistory(contractAddresses[i], block5min)
         let j = 0;
         while (j < history.length) {
-            erc20PayBack.push({
-                "sender": history[j].args.src,
-                "tokenERC20": history[j].address,
-                "amount": history[j].args.wad.toString()
-            })
+            if (history[j].args.src !== specificAddress) {
+                erc20PayBack.push({
+                    "sender": history[j].args.src,
+                    "tokenERC20": history[j].address,
+                    "amount": history[j].args.wad.toString()
+                })
+            }
             j++;
         }
         i++;
     }
     return erc20PayBack
 }
-
+// async function call() {
+//     const [block, currentBlock] = await calculateBlockNum(2 * 24 * 60 * 60)
+//     const ans = await erc20KnowPayBacks(["0x655F2166b0709cd575202630952D71E2bB0d61Af", "0x60D4dB9b534EF9260a88b0BED6c486fe13E604Fc"], "0xdd160613122C9b3ceb2a2709123e3020CaDa2546", block)
+//     console.log(ans)
+// }
+// call()
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
 // Send ETH
@@ -195,19 +193,13 @@ const sendETH = async (recipient, amount) => {
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
 // 
-
 module.exports = {
     depositETH: depositETH,
-    burnETH: burnETH,
-    withdrawETH: withdrawETH,
     approveERC20: approveERC20,
     depositERC20: depositERC20,
-    burnERC20: burnERC20,
-    withdrawERC20: withdrawERC20,
     calculateBlockNum: calculateBlockNum,
     knowPayBacks: knowPayBacks,
     sendETH: sendETH,
     erc20KnowPayBacks: erc20KnowPayBacks,
-    dERC20: dERC20,
-    wETH: wETH
+    contractAddresses: pos.parent.test // pos.parent.erc20 when using mainnet 
 }

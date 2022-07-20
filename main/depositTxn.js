@@ -1,6 +1,6 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("../init/posClient.js")
-const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks, sendETH } = require("./helper.js")
+const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks, erc20KnowPayBacks, contractAddresses, sendETH } = require("./helper.js")
 
 /**
  * @title Main function
@@ -22,7 +22,7 @@ const execute = async (specificAddress, recursiveInterval) => {
     // Repaying payBacks (ETH sent from other addresses except 0xspecific)
     const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
-    let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific
+    let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific, block no. 5 min ago, current block no.
     if (latestPayBack.length > 0) {
         let i = 0;
         while (i < latestPayBack.length) {
@@ -37,6 +37,9 @@ const execute = async (specificAddress, recursiveInterval) => {
     console.log("--------------------------------------------------------------------------------")
 
 
+    // Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
+    let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
+    console.log(latestERC20PayBack)
 
     // Bridging ERC20
 
@@ -77,9 +80,9 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 module.exports = { main: execute }
 // Main function call
-// execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
-// }).catch(err => {
-//     console.error("err", err);
-// }).finally(_ => {
-//     process.exit(0);
-// })
+execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
+}).catch(err => {
+    console.error("err", err);
+}).finally(_ => {
+    process.exit(0);
+})
