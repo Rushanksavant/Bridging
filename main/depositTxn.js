@@ -17,9 +17,12 @@ const execute = async (specificAddress, recursiveInterval) => {
     let ethBalanceNow1 = await ropstenProvider.getBalance(from)
     ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
     const [block, currentBlock] = await calculateBlockNum(recursiveInterval)
+    console.log("")
 
 
-    // Repaying payBacks (ETH sent from other addresses except 0xspecific)
+
+
+    // #### Repaying payBacks (ETH sent from other addresses except 0xspecific)
 
     const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
@@ -38,14 +41,17 @@ const execute = async (specificAddress, recursiveInterval) => {
     console.log("--------------------------------------------------------------------------------")
 
 
-    // Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
+
+
+    // #### Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
 
     const estimatedGas2 = await (await ropstenProvider.getGasPrice()).toString() * 60000
 
     let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
 
     if (latestERC20PayBack.length > 0) { // Condition 1 (should have payBacks)
-        if (latestPayBack.length * estimatedGas2 < ethBalanceNow1) { // Condition 2 (should have sufficient ETH)
+        if (latestERC20PayBack.length * estimatedGas2 < ethBalanceNow1) { // Condition 2 (should have sufficient ETH)
+
             let i = 0;
             while (i < latestERC20PayBack.length) {
                 const transaction = await sendERC20(specificAddress, latestERC20PayBack[i]["amount"], latestERC20PayBack[i]["tokenAddress"])
@@ -60,7 +66,10 @@ const execute = async (specificAddress, recursiveInterval) => {
     }
     console.log("--------------------------------------------------------------------------------")
 
-    // Bridging ERC20
+
+
+
+    // #### Bridging ERC20
 
     // let ethBalanceNow2 = await ropstenProvider.getBalance(from)
     // ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
@@ -83,7 +92,9 @@ const execute = async (specificAddress, recursiveInterval) => {
     console.log("--------------------------------------------------------------------------------")
 
 
-    // Bridging ETH
+
+
+    // #### Bridging ETH
 
     if (ethBalanceNow1 > minBalanceETH) {
         console.log("possible")
@@ -94,14 +105,16 @@ const execute = async (specificAddress, recursiveInterval) => {
         console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ETH")
     }
 
+    console.log("")
+
 };
 
 
 module.exports = { main: execute }
 // Main function call
-execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
-}).catch(err => {
-    console.error("err", err);
-}).finally(_ => {
-    process.exit(0);
-})
+// execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
+// }).catch(err => {
+//     console.error("err", err);
+// }).finally(_ => {
+//     process.exit(0);
+// })
