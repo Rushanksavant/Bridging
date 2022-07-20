@@ -71,23 +71,28 @@ const withdrawERC20 = async (client, tokenAddress, txHash) => {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
-// Know payBacks
-
-async function txnHistory(address) { // last 5 mins
+async function calculateBlockNum(timeInterval) {
     const provider = new ethers.providers.EtherscanProvider("goerli");
     const currentBlock = await provider.getBlockNumber()
     const blockTime = 15; // ETH block time is 15 seconds
 
     //Block number 5 mins ago
-    const block5min = currentBlock - (300 / blockTime); // 5min = 300sec
+    const block = currentBlock - (timeInterval / blockTime);
+
+    return block
+}
+// Know payBacks
+
+async function txnHistory(address, block5min) { // last 5 mins
+    // const block5min = calculateBlockNum(300) // 5min = 300sec
 
     // Get all txs for address since 5 mins
     let history = await provider.getHistory(address, block5min, currentBlock);
     return history
 }
 
-async function knowPayBacks(myAddress, specificAddress) {
-    const history = await txnHistory(myAddress)
+async function knowPayBacks(myAddress, specificAddress, block5min) {
+    const history = await txnHistory(myAddress, block5min)
     let i = 0;
     let payBack = [];
     while (i < history.length) {
@@ -114,6 +119,56 @@ async function knowPayBacks(myAddress, specificAddress) {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
+// Know ERC20 payBacks
+
+const erc20ABI = [
+    'event Approval(address indexed src, address indexed guy, uint256 wad)',
+    'event LogNote(bytes4 indexed sig, address indexed usr, bytes32 indexed arg1, bytes32 indexed arg2, bytes data) anonymous',
+    'event Transfer(address indexed src, address indexed dst, uint256 wad)',
+]
+
+const dERC20_Add = "0x655F2166b0709cd575202630952D71E2bB0d61Af";
+const dERC20 = new ethers.Contract(dERC20_Add, erc20ABI, ropstenProvider); // Contract pointer
+
+const wETH_Add = "0x60D4dB9b534EF9260a88b0BED6c486fe13E604Fc";
+const wETH = new ethers.Contract(wETH_Add, erc20ABI, ropstenProvider); // Contract pointer
+
+
+async function erc20TxnHistory(contract, block5min) {
+
+    function arrayFilter(transferTxn) {
+        return transferTxn["blockNumber"] >= block5min
+    }
+
+    const eventFilter = contract.filters.Transfer(null, "0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", null)
+    const events = await contract.queryFilter(eventFilter)
+    var filtered = events.filter(arrayFilter)
+    return filtered
+}
+
+async function erc20KnowPayBacks(contractPointers, block5min) {
+    // const block5min = calculateBlockNum(300) // 5min = 300sec
+    let erc20PayBack = []
+
+    let i = 0;
+    while (i < contractPointers.length) {
+        const history = await erc20TxnHistory(contractPointers[i], block5min)
+        let j = 0;
+        while (j < history.length) {
+            erc20PayBack.push({
+                "sender": history[j].args.src,
+                "tokenERC20": history[j].address,
+                "amount": history[j].args.wad.toString()
+            })
+            j++;
+        }
+        i++;
+    }
+    return erc20PayBack
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
+
 // Send ETH
 
 const sendETH = async (recipient, amount) => {
@@ -134,6 +189,10 @@ const sendETH = async (recipient, amount) => {
     return transaction
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
+
+// 
+
 module.exports = {
     depositETH: depositETH,
     burnETH: burnETH,
@@ -142,6 +201,10 @@ module.exports = {
     depositERC20: depositERC20,
     burnERC20: burnERC20,
     withdrawERC20: withdrawERC20,
+    calculateBlockNum: calculateBlockNum,
     knowPayBacks: knowPayBacks,
-    sendETH: sendETH
+    sendETH: sendETH,
+    erc20KnowPayBacks: erc20KnowPayBacks,
+    dERC20: dERC20,
+    wETH: wETH
 }

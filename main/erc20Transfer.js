@@ -16,7 +16,7 @@ const wETH = new ethers.Contract(wETH_Add, erc20ABI, ropstenProvider); // Contra
 async function erc20TxnHistory(contract, block5min) {
 
     function arrayFilter(transferTxn) {
-        return transferTxn["blockNumber"] >= 7252400
+        return transferTxn["blockNumber"] >= block5min
     }
 
     const eventFilter = contract.filters.Transfer(null, "0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", null)
@@ -34,24 +34,25 @@ async function erc20KnowPayBacks(contractPointers) {
     //Block number 5 mins ago
     const block5min = currentBlock - (300 / blockTime); // 5min = 300sec
 
-    let i;
+    let i = 0;
     while (i < contractPointers.length) {
         const history = await erc20TxnHistory(contractPointers[i], block5min)
-        consoles.log(history)
-        // let j
-        // while (j < history.length) {
-        //     erc20PayBack.push({
-        //         "sender": history[j].args.src,
-        //         "tokenERC20": history[j].address,
-        //         "amount": history[j].args.wad.toString()
-        //     })
-        // }
+        let j = 0;
+        while (j < history.length) {
+            erc20PayBack.push({
+                "sender": history[j].args.src,
+                "tokenERC20": history[j].address,
+                "amount": history[j].args.wad.toString()
+            })
+            j++;
+        }
+        i++;
     }
     return erc20PayBack
 }
 
-async function call() {
-    const ans = await erc20KnowPayBacks([dERC20, wETH_Add])
-    console.log(ans)
-}
-call()
+// async function call() {
+//     const ans = await erc20KnowPayBacks([dERC20, wETH])
+//     console.log(ans)
+// }
+// call()
