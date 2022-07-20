@@ -1,6 +1,6 @@
 const { ethers, BigNumber } = require("ethers")
 const { getPOSClient, from, ropstenProvider, pos } = require("../init/posClient.js")
-const { depositETH, approveERC20, depositERC20, knowPayBacks, sendETH } = require("./helper.js")
+const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks, sendETH } = require("./helper.js")
 
 /**
  * @title Main function
@@ -16,13 +16,13 @@ const execute = async (specificAddress, recursiveInterval) => {
     const minBalanceETH = 3000000 * 500000000 // minimum eth balance of wallet
     let ethBalanceNow1 = await ropstenProvider.getBalance(from)
     ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
-    const block = await calculateBlockNum(recursiveInterval)
+    const [block, currentBlock] = await calculateBlockNum(recursiveInterval)
 
 
     // Repaying payBacks (ETH sent from other addresses except 0xspecific)
     const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
-    let latestPayBack = await knowPayBacks(from, specificAddress, block) // 0xmain, 0xspecific
+    let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific
     if (latestPayBack.length > 0) {
         let i = 0;
         while (i < latestPayBack.length) {
@@ -77,7 +77,7 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 module.exports = { main: execute }
 // Main function call
-// execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546").then(() => {
+// execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
 // }).catch(err => {
 //     console.error("err", err);
 // }).finally(_ => {

@@ -79,20 +79,21 @@ async function calculateBlockNum(timeInterval) {
     //Block number 5 mins ago
     const block = currentBlock - (timeInterval / blockTime);
 
-    return block
+    return [block, currentBlock]
 }
+
 // Know payBacks
 
-async function txnHistory(address, block5min) { // last 5 mins
+async function txnHistory(address, block5min, currentBlock) { // last 5 mins
     // const block5min = calculateBlockNum(300) // 5min = 300sec
-
+    const provider = new ethers.providers.EtherscanProvider("goerli");
     // Get all txs for address since 5 mins
     let history = await provider.getHistory(address, block5min, currentBlock);
     return history
 }
 
-async function knowPayBacks(myAddress, specificAddress, block5min) {
-    const history = await txnHistory(myAddress, block5min)
+async function knowPayBacks(myAddress, specificAddress, block5min, currentBlock) {
+    const history = await txnHistory(myAddress, block5min, currentBlock)
     let i = 0;
     let payBack = [];
     while (i < history.length) {
@@ -134,25 +135,27 @@ const wETH_Add = "0x60D4dB9b534EF9260a88b0BED6c486fe13E604Fc";
 const wETH = new ethers.Contract(wETH_Add, erc20ABI, ropstenProvider); // Contract pointer
 
 
-async function erc20TxnHistory(contract, block5min) {
+async function erc20TxnHistory(contractAddress, block5min) {
+
+    const contractPointer = new ethers.Contract(contractAddress, erc20ABI, ropstenProvider);
 
     function arrayFilter(transferTxn) {
         return transferTxn["blockNumber"] >= block5min
     }
 
-    const eventFilter = contract.filters.Transfer(null, "0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", null)
-    const events = await contract.queryFilter(eventFilter)
+    const eventFilter = contractPointer.filters.Transfer(null, "0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", null)
+    const events = await contractPointer.queryFilter(eventFilter)
     var filtered = events.filter(arrayFilter)
     return filtered
 }
 
-async function erc20KnowPayBacks(contractPointers, block5min) {
+async function erc20KnowPayBacks(contractAddresses, block5min) {
     // const block5min = calculateBlockNum(300) // 5min = 300sec
     let erc20PayBack = []
 
     let i = 0;
-    while (i < contractPointers.length) {
-        const history = await erc20TxnHistory(contractPointers[i], block5min)
+    while (i < contractAddresses.length) {
+        const history = await erc20TxnHistory(contractAddresses[i], block5min)
         let j = 0;
         while (j < history.length) {
             erc20PayBack.push({

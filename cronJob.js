@@ -6,6 +6,6 @@ cron.schedule('0 */5 * * * *', async () => {
     console.log('********************************************************************************');
     console.log('');
 
-    await main("0xdd160613122C9b3ceb2a2709123e3020CaDa2546");
+    await main("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300); // 0xmain, 5min- 300sec
 
 });
