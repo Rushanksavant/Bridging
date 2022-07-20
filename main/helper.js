@@ -79,10 +79,10 @@ async function txnHistory(address) { // last 5 mins
     const blockTime = 15; // ETH block time is 15 seconds
 
     //Block number 5 mins ago
-    const block2min = currentBlock - (300 / blockTime); // 5min = 300sec
+    const block5min = currentBlock - (300 / blockTime); // 5min = 300sec
 
     // Get all txs for address since 5 mins
-    let history = await provider.getHistory(address, block2min, currentBlock);
+    let history = await provider.getHistory(address, block5min, currentBlock);
     return history
 }
 
