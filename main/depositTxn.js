@@ -20,6 +20,7 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 
     // Repaying payBacks (ETH sent from other addresses except 0xspecific)
+
     const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
     let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific, block no. 5 min ago, current block no.
@@ -38,8 +39,26 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 
     // Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
+
+    const estimatedGas2 = await (await ropstenProvider.getGasPrice()).toString() * 60000
+
     let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
-    console.log(latestERC20PayBack)
+
+    if (latestERC20PayBack.length > 0) { // Condition 1 (should have payBacks)
+        if (latestPayBack.length * estimatedGas2 < ethBalanceNow1) { // Condition 2 (should have sufficient ETH)
+            let i = 0;
+            while (i < latestERC20PayBack.length) {
+                const transaction = await sendERC20(specificAddress, latestERC20PayBack[i]["amount"], latestERC20PayBack[i]["tokenAddress"])
+                console.log(transaction)
+                i++
+            }
+        } else {
+            console.log("Insufficient balance to pay for gas fees")
+        }
+    } else {
+        console.log("No ERC20 payBacks in last 5 mins")
+    }
+    console.log("--------------------------------------------------------------------------------")
 
     // Bridging ERC20
 
