@@ -78,7 +78,7 @@ async function txnHistory(address) { // last 5 mins
     const currentBlock = await provider.getBlockNumber()
     const blockTime = 15; // ETH block time is 15 seconds
 
-    //Block number 2 hours, 24 hours and 48 hours ago
+    //Block number 5 mins ago
     const block2min = currentBlock - (300 / blockTime); // 5min = 300sec
 
     // Get all txs for address since 5 mins
