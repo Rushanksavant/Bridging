@@ -12,7 +12,6 @@ const { depositETH, approveERC20, depositERC20, calculateBlockNum, knowPayBacks,
 const execute = async (specificAddress, recursiveInterval) => {
 
     const client = await getPOSClient();
-    const tokens = pos.parent.test
     const minBalanceETH = 1000000 * 5000000000 // minimum eth balance of wallet
     const [block, currentBlock] = await calculateBlockNum(recursiveInterval)
 
@@ -76,8 +75,8 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     if (ethBalanceNow2 > 500000000000000) { // 0.0005 ETH
         let i = 0;
-        while (i < tokens.length) {
-            const erc20Token = client.erc20(tokens[i], true);
+        while (i < contractAddresses.length) {
+            const erc20Token = client.erc20(contractAddresses[i], true);
             let balance = await erc20Token.getBalance(from);
             balance = BigNumber.from(balance).toString()
             if (balance > 0) {
