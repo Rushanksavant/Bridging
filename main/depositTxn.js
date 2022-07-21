@@ -14,9 +14,10 @@ const execute = async (specificAddress, recursiveInterval) => {
     const client = await getPOSClient();
     const tokens = pos.parent.test
     const minBalanceETH = 1000000 * 5000000000 // minimum eth balance of wallet
-    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
-    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
     const [block, currentBlock] = await calculateBlockNum(recursiveInterval)
+
+    let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific, block no. 5 min ago, current block no.
+    let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
     console.log("")
 
 
@@ -26,7 +27,6 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     const estimatedGas = await (await ropstenProvider.getGasPrice()).toString() * 30000
 
-    let latestPayBack = await knowPayBacks(from, specificAddress, block, currentBlock) // 0xmain, 0xspecific, block no. 5 min ago, current block no.
     if (latestPayBack.length > 0) {
         let i = 0;
         while (i < latestPayBack.length) {
@@ -44,8 +44,6 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 
     // #### Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
-
-    let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
 
     if (latestERC20PayBack.length > 0) { // Condition 1 (should have payBacks)
         if (ethBalanceNow1 > 500000000000000) { // Condition 2 (should have sufficient ETH) 0.0005 ETH
@@ -98,6 +96,9 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 
     // #### Bridging ETH
+
+    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
+    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
 
     if (ethBalanceNow1 > minBalanceETH) {
         console.log("possible")
