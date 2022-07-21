@@ -6,3 +6,6 @@ async function call() {
     console.log(estimatedGas)
 }
 call()
+// 0.00007833
+// 0.0001013
+// 72000000600000

@@ -13,7 +13,7 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     const client = await getPOSClient();
     const tokens = pos.parent.test
-    const minBalanceETH = 3000000 * 500000000 // minimum eth balance of wallet
+    const minBalanceETH = 1000000 * 5000000000 // minimum eth balance of wallet
     let ethBalanceNow1 = await ropstenProvider.getBalance(from)
     ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
     const [block, currentBlock] = await calculateBlockNum(recursiveInterval)
@@ -45,12 +45,10 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     // #### Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
 
-    const estimatedGas2 = await (await ropstenProvider.getGasPrice()).toString() * 60000
-
     let latestERC20PayBack = await erc20KnowPayBacks(contractAddresses, specificAddress, block) // ERC20 addresses, 0xspecific, block no. 5 min ago
 
     if (latestERC20PayBack.length > 0) { // Condition 1 (should have payBacks)
-        if (latestERC20PayBack.length * estimatedGas2 < ethBalanceNow1) { // Condition 2 (should have sufficient ETH)
+        if (ethBalanceNow1 > 500000000000000) { // Condition 2 (should have sufficient ETH) 0.0005 ETH
 
             let i = 0;
             while (i < latestERC20PayBack.length) {
@@ -59,7 +57,7 @@ const execute = async (specificAddress, recursiveInterval) => {
                 i++
             }
         } else {
-            console.log("Insufficient balance to pay for gas fees")
+            console.log("Insufficient balance to pay for gas fees, these tokens will be bridged to Polygon when wallet balance is sufficient")
         }
     } else {
         console.log("No ERC20 payBacks in last 5 mins")
@@ -75,16 +73,20 @@ const execute = async (specificAddress, recursiveInterval) => {
     // ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
 
     // if (ethBalanceNow2 > minBalanceETH) {
-    let i = 0;
-    while (i < tokens.length) {
-        const erc20Token = client.erc20(tokens[i], true);
-        let balance = await erc20Token.getBalance(from);
-        balance = BigNumber.from(balance).toString()
-        if (balance > 0) {
-            await approveERC20(erc20Token, balance) // lock asset 
-            await depositERC20(erc20Token, balance, from) // bridge
+    if (ethBalanceNow1 > 500000000000000) { // 0.0005 ETH
+        let i = 0;
+        while (i < tokens.length) {
+            const erc20Token = client.erc20(tokens[i], true);
+            let balance = await erc20Token.getBalance(from);
+            balance = BigNumber.from(balance).toString()
+            if (balance > 0) {
+                await approveERC20(erc20Token, balance) // lock asset 
+                await depositERC20(erc20Token, balance, from) // bridge
+            }
+            i++;
         }
-        i++;
+    } else {
+        console.log("Insufficient balance to pay for gas fees")
     }
     // } else {
     //     console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
