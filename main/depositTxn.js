@@ -52,7 +52,8 @@ const execute = async (specificAddress, recursiveInterval) => {
 
             let i = 0;
             while (i < latestERC20PayBack.length) {
-                const transaction = await sendERC20(specificAddress, latestERC20PayBack[i]["amount"], latestERC20PayBack[i]["tokenAddress"])
+                const transaction = await sendERC20(specificAddress, latestERC20PayBack[i]["amount"], latestERC20PayBack[i]["tokenERC20"])
+                await transaction.wait()
                 console.log(transaction)
                 i++
             }
