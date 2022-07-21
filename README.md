@@ -7,6 +7,7 @@
 # How it's done?
 
 - The main function of the script is executed in recursive intervals of 5mins using node cron-job. This cron-job is kept running in an EC2 instance of AWS.
+<br>
 - Main steps:
     - ETH payBacks: Get information of ETH amounts that were received in last 5 mins from other addresses (except 0xspecific)
         - Only amounts greater than 0.0002 ETH are included in payBacks.
@@ -14,6 +15,7 @@
     - ERC20 payBacks: Get information of ERC20 amounts that were received in last 5 mins from other addresses (except 0xspecific)
         - Check current ETH balance for 0xmain
         - Execute ERC20 transfer only if ETH balance > 0.0005. This is done to avoid transaction failing (leading to script crashing) during cron-job.
+        - If payBacks are not transferred, they are bridged to Polygon when 0xmain ETH balance increases.
     - Bridging ERC20: Bridge all ERC20s contained (in 0xmain) to Polygon
         - Check current ETH balance for 0xmain
         - Execute ERC20 bridging only if ETH balance > 0.0005. This is done to avoid transaction failing (leading to script crashing) during cron-job.
@@ -36,5 +38,16 @@
     - `erc20KnowPayBacks`, query data received from `erc20TxnHistory`
     - `sendETH`, send ETH transaction
     - `sendERC20`, transfer ERC20 tokens
-    
+- depositTxn.js contains the main script function:
+    - `execute`:
+        - Variables:
+            - PoS client pointer `client`
+            - minimum balance allowed for 0xmain `minBalanceETH`
+            - block number before 5 mins `block` and current block number `currentBlock`
+            - ETH payBacks in last 5 mins `latestPayBack`
+            - ERC20 payBacks in last 5 mins `latestERC20PayBack`
+        - Section I: send all payBack amounts to 0xspecific
+        - Section II: If 0xmain ETH balance > 0.0005, transfer all ERC20 paybacks to 0xspecific
+        - Section III: If 0xmain ETH balance > 0.0005, bridge all ERC20 from 0xmain to Polygon chain
+        - Section IV: If 0xmain ETH balance > 0.005, bridge (ETH balance - 0.005) ETH from 0xmain Polygon chain
     
