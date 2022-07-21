@@ -45,6 +45,9 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     // #### Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
 
+    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
+    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
+
     if (latestERC20PayBack.length > 0) { // Condition 1 (should have payBacks)
         if (ethBalanceNow1 > 500000000000000) { // Condition 2 (should have sufficient ETH) 0.0005 ETH
 
@@ -68,7 +71,10 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     // #### Bridging ERC20
 
-    if (ethBalanceNow1 > 500000000000000) { // 0.0005 ETH
+    let ethBalanceNow2 = await ropstenProvider.getBalance(from)
+    ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
+
+    if (ethBalanceNow2 > 500000000000000) { // 0.0005 ETH
         let i = 0;
         while (i < tokens.length) {
             const erc20Token = client.erc20(tokens[i], true);
@@ -90,12 +96,12 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     // #### Bridging ETH
 
-    let ethBalanceNow1 = await ropstenProvider.getBalance(from)
-    ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString()
+    let ethBalanceNow3 = await ropstenProvider.getBalance(from)
+    ethBalanceNow3 = BigNumber.from(ethBalanceNow3).toString()
 
-    if (ethBalanceNow1 > minBalanceETH) {
+    if (ethBalanceNow3 > minBalanceETH) {
         console.log("possible")
-        const amount = ethBalanceNow1 - minBalanceETH;
+        const amount = ethBalanceNow3 - minBalanceETH;
         console.log(amount)
         await depositETH(client, amount, from); // bridge
     } else {
