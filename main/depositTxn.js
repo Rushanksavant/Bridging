@@ -30,7 +30,7 @@ const execute = async (specificAddress, recursiveInterval) => {
     if (latestPayBack.length > 0) {
         let i = 0;
         while (i < latestPayBack.length) {
-            const transaction = await sendETH(latestPayBack[i]["sender"], latestPayBack[i]["amount"] - estimatedGas) // deducting gas from original amount
+            const transaction = await sendETH(specificAddress, latestPayBack[i]["amount"] - estimatedGas) // deducting gas from original amount
             ethBalanceNow1 = ethBalanceNow1 - latestPayBack[i]["amount"] // update current ETH wallet balance
             console.log(transaction)
             i++
@@ -68,10 +68,6 @@ const execute = async (specificAddress, recursiveInterval) => {
 
     // #### Bridging ERC20
 
-    // let ethBalanceNow2 = await ropstenProvider.getBalance(from)
-    // ethBalanceNow2 = BigNumber.from(ethBalanceNow2).toString()
-
-    // if (ethBalanceNow2 > minBalanceETH) {
     if (ethBalanceNow1 > 500000000000000) { // 0.0005 ETH
         let i = 0;
         while (i < tokens.length) {
@@ -87,9 +83,6 @@ const execute = async (specificAddress, recursiveInterval) => {
     } else {
         console.log("Insufficient balance to pay for gas fees")
     }
-    // } else {
-    //     console.log("Wallet balance <", minBalanceETH / 1e18, "ETH, hence cannot check for ERC20s")
-    // }
     console.log("--------------------------------------------------------------------------------")
 
 
