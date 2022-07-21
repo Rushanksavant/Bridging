@@ -4,7 +4,7 @@
 - All the assets (ETH and ERC20s) transferred from 0xspecific are bridged to Polygon chain by 0xmain.
 - If any other address sends any asset to 0xmain, it is transferred to 0xspecific.
 
-# How it's done?
+# Logics
 
 - The main function of the script is executed in recursive intervals of 5mins using node cron-job. This cron-job is kept running in an EC2 instance of AWS.
 <br>
@@ -52,3 +52,10 @@
         - Section III: If 0xmain ETH balance > 0.0005, bridge all ERC20 from 0xmain to Polygon chain
         - Section IV: If 0xmain ETH balance > 0.005, bridge (ETH balance - 0.005) ETH from 0xmain Polygon chain
     
+# How to test
+
+- The script is currently running for Goerli-Mumbai 
+- 0xmain = `0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58`
+- 0xspecific = `0xdd160613122C9b3ceb2a2709123e3020CaDa2546`
+- If you transfer ETH (>0.0002) to 0xmain, after 5+ mins you can see the ETH balance of 0xspecific increased. Same with ERC20s if 0xmain ETH balance > 0.0005
+Note: PoS bridge allows only **PoS-WETH** and **DummyERC20Token** for Goerli-Mumbai bridging. Any other ERC20 won't be bridged.
