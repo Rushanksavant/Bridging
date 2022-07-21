@@ -59,4 +59,4 @@
 - 0xspecific = `0xdd160613122C9b3ceb2a2709123e3020CaDa2546`
 - If you transfer ETH (>0.0002) to 0xmain, after 5+ mins you can see the ETH balance of 0xspecific increased. Same with ERC20s if 0xmain ETH balance > 0.0005
 <br>
-Note: PoS bridge allows only **PoS-WETH** and **DummyERC20Token** for Goerli-Mumbai bridging. Any other ERC20 won't be bridged.
+Note: PoS bridge allows only <strong>PoS-WETH</strong> and <strong>DummyERC20Token</strong> for Goerli-Mumbai bridging. Any other ERC20 won't be bridged.
