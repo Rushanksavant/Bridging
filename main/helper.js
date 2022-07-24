@@ -12,22 +12,6 @@ const depositETH = async (client, amount, userAddress) => {
 
   console.log('ETH deposited');
 };
-const burnETH = async (client, tokenAddressETH, amount) => {
-  const erc20Token = client.erc20(tokenAddressETH);
-  const result = await erc20Token.withdrawStart(amount);
-  const txHash = await result.getTransactionHash();
-  console.log('Burn ETH txHash = ', txHash);
-  const txReceipt = await result.getReceipt();
-
-  return txHash;
-};
-const withdrawETH = async (client, tokenAddressETH, txnHash) => {
-  const erc20RootToken = client.erc20(tokenAddressETH, true);
-  const result = await erc20RootToken.withdrawExit(txnHash);
-  const txHash = await result.getTransactionHash();
-  console.log('Withdraw ETH txHash = ', txHash);
-  const txReceipt = await result.getReceipt();
-};
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
@@ -48,22 +32,6 @@ const depositERC20 = async (erc20RootToken, amount, userAddress) => {
   const txReceipt = await result.getReceipt();
 
   console.log('ERC20 deposited');
-};
-const burnERC20 = async (client, tokenAddress, amount) => {
-  const erc20Token = client.erc20(tokenAddress);
-  const result = await erc20Token.withdrawStart(amount);
-  const txHash = await result.getTransactionHash();
-  console.log('Burn ERC20 txHash = ', txHash);
-  const txReceipt = await result.getReceipt();
-
-  return txHash;
-};
-const withdrawERC20 = async (client, tokenAddress, txHash) => {
-  const erc20RootToken = client.erc20(tokenAddress, true);
-  const result = await erc20RootToken.withdrawExit(txHash);
-  const txHashExit = await result.getTransactionHash();
-  console.log('Exit ERC20 txHash = ', txHashExit);
-  const txReceipt = await result.getReceipt();
 };
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -112,12 +80,6 @@ async function knowPayBacks(
   }
   return payBack;
 }
-
-// async function caller() {
-//     const pays = await knowPayBacks("0x9b52aa46AfaED4E9E5F576d19D369C65F9f3ea58", "0xdd160613122C9b3ceb2a2709123e3020CaDa2546")
-//     console.log(pays)
-// }
-// caller()
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
@@ -178,12 +140,6 @@ async function erc20KnowPayBacks(
   }
   return erc20PayBack;
 }
-// async function call() {
-//     const [block, currentBlock] = await calculateBlockNum(2 * 24 * 60 * 60)
-//     const ans = await erc20KnowPayBacks(["0x655F2166b0709cd575202630952D71E2bB0d61Af", "0x60D4dB9b534EF9260a88b0BED6c486fe13E604Fc"], "0xdd160613122C9b3ceb2a2709123e3020CaDa2546", block)
-//     console.log(ans)
-// }
-// call()
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
 
