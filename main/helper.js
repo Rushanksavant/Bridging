@@ -49,20 +49,16 @@ async function calculateBlockNum(timeInterval) {
 
 // Know payBacks
 
-async function txnHistory(address, block5min, currentBlock) {
-  const provider = new ethers.providers.EtherscanProvider('goerli');
-  // Get all txs for address since 5 mins
-  let history = await provider.getHistory(address, block5min, currentBlock);
-  return history;
-}
-
 async function knowPayBacks(
   myAddress,
   specificAddress,
   block5min,
   currentBlock
 ) {
-  const history = await txnHistory(myAddress, block5min, currentBlock);
+  const provider = new ethers.providers.EtherscanProvider('goerli');
+  // Get all txs for address since 5 mins
+  let history = await provider.getHistory(myAddress, block5min, currentBlock);
+
   let i = 0;
   let payBack = [];
   while (i < history.length) {
