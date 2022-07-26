@@ -10,6 +10,7 @@ const {
   contractAddresses,
   sendETH,
   sendERC20,
+  delay,
 } = require('./helper.js');
 
 /**
@@ -53,7 +54,7 @@ const execute = async (specificAddress, recursiveInterval) => {
         (latestPayBack[i]['amount'] - estimatedGas).toString()
       ); // deducting gas from original amount
       ethBalanceNow1 = ethBalanceNow1 - latestPayBack[i]['amount']; // update current ETH wallet balance
-      await transaction.wait();
+      delay(3000); // 3 seconds delay after txn initialization
       console.log(transaction);
       i++;
     }

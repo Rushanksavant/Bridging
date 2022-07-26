@@ -183,7 +183,19 @@ async function sendERC20(recipient, amount, tokenAddress) {
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------- //
-//
+
+// Time delay
+
+function codeExecutionDelay(seconds) {
+  var start = new Date().getTime();
+  var end = start;
+  while (end < start + seconds) {
+    end = new Date().getTime();
+  }
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------- //
+
 module.exports = {
   depositETH: depositETH,
   approveERC20: approveERC20,
@@ -194,4 +206,5 @@ module.exports = {
   erc20KnowPayBacks: erc20KnowPayBacks,
   contractAddresses: pos.parent.test, // pos.parent.erc20 when using mainnet
   sendERC20: sendERC20,
+  delay: codeExecutionDelay,
 };
