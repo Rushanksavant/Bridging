@@ -37,6 +37,9 @@ const execute = async (specificAddress, recursiveInterval) => {
   ); // ERC20 addresses, 0xspecific, block no. 5 min ago
   console.log('');
 
+  let ethBalanceNow1 = await ropstenProvider.getBalance(from);
+  ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString();
+
   // #### Repaying payBacks (ETH sent from other addresses except 0xspecific)
 
   const estimatedGas =
@@ -47,9 +50,10 @@ const execute = async (specificAddress, recursiveInterval) => {
     while (i < latestPayBack.length) {
       const transaction = await sendETH(
         specificAddress,
-        latestPayBack[i]['amount'] - estimatedGas
+        (latestPayBack[i]['amount'] - estimatedGas).toString()
       ); // deducting gas from original amount
       ethBalanceNow1 = ethBalanceNow1 - latestPayBack[i]['amount']; // update current ETH wallet balance
+      await transaction.wait();
       console.log(transaction);
       i++;
     }
@@ -61,9 +65,6 @@ const execute = async (specificAddress, recursiveInterval) => {
   );
 
   // #### Repaying payBacks (ERC20 sent from other addresses except 0xspecific)
-
-  let ethBalanceNow1 = await ropstenProvider.getBalance(from);
-  ethBalanceNow1 = BigNumber.from(ethBalanceNow1).toString();
 
   if (latestERC20PayBack.length > 0) {
     // Condition 1 (should have payBacks)
@@ -125,9 +126,10 @@ const execute = async (specificAddress, recursiveInterval) => {
 
   if (ethBalanceNow3 > minBalanceETH) {
     console.log('possible');
-    const amount = ethBalanceNow3 - minBalanceETH;
+    let amount = ethBalanceNow3 - minBalanceETH;
+    // amount = BigNumber.from(amount).toString();
     console.log(amount);
-    await depositETH(client, amount, from); // bridge
+    await depositETH(client, amount.toString(), from); // bridge
   } else {
     console.log(
       'Wallet balance <',
@@ -141,9 +143,11 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 module.exports = { main: execute };
 // Main function call
-// execute("0xdd160613122C9b3ceb2a2709123e3020CaDa2546", 300).then(() => {
-// }).catch(err => {
-//     console.error("err", err);
-// }).finally(_ => {
-//     process.exit(0);
-// })
+execute('0xdd160613122C9b3ceb2a2709123e3020CaDa2546', 300)
+  .then(() => {})
+  .catch((err) => {
+    console.error('err', err);
+  })
+  .finally((_) => {
+    process.exit(0);
+  });
