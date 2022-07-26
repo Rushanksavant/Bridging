@@ -64,18 +64,23 @@
 ## Transaction hashs:
 
 - ERC20 PayBacks
+  <br>
   hash: 0x4c776ec4e8c5cc01e1d71e959d7bc4169cace79e76d2bba7cad459c945f55a17
   ![ERC20 payback](./imgs/repayERC20.PNG)
 
 - ERC20 Bridging
+  <br>
   Approve ERC20 txHash = 0x05cb4bc2edd10df30745dbf3d97fc8c4b5da1f8b9a6cdb0fed7ba3756a63323b
+  <br>
   Deposit ERC20 txHash = 0x7257504d85bed8ac9c049dbae14ac6d6574ec738f1b244cdf55d784631439bd2
   ![ERC20 bridging](./imgs/bridgeERC20.PNG)
 
 - ETH Bridging
+  <br>
   Deposit ETH txHash = 0x5be8c7291736de888d5dc5377f34475966841ad665a5b9737547e00cfe5a140d
   ![ETH bridging](./imgs/bridgeETH.PNG)
 
 - ETH PayBacks
+  <br>
   transactionHash: 0x1e002f748112bb0b97f46e5e50964c5fc6fe8cda7d85f7fd9219d1a4698e2c90
   ![ETH payback](./imgs/repayETH.PNG)
