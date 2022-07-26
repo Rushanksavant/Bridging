@@ -143,11 +143,11 @@ const execute = async (specificAddress, recursiveInterval) => {
 
 module.exports = { main: execute };
 // Main function call
-execute('0xdd160613122C9b3ceb2a2709123e3020CaDa2546', 300)
-  .then(() => {})
-  .catch((err) => {
-    console.error('err', err);
-  })
-  .finally((_) => {
-    process.exit(0);
-  });
+// execute('0xdd160613122C9b3ceb2a2709123e3020CaDa2546', 300)
+//   .then(() => {})
+//   .catch((err) => {
+//     console.error('err', err);
+//   })
+//   .finally((_) => {
+//     process.exit(0);
+//   });
